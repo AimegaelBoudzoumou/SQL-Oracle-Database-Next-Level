@@ -141,7 +141,7 @@ from   toys
 where  coalesce ( volume_of_wood , 0 ) < 15;
 ```
 
-### Tryb it
+### Try it
 Complete the following query to find all the rows where times_lost is less than 5 or null:
 
 ```sql
