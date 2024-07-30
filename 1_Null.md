@@ -167,3 +167,50 @@ where coalesce ( times_lost , 0 ) < 5;
 ```
 
 ## 7. Magic Values
+Null complicates your where clause. So some people are tempted to use "magic values" instead of null for missing or not applicable information.
+
+For example, Mr. Penguin is made of fluff, not wood! So to show the volume_of_wood doesn't apply, you could set this to the "impossible" value of minus one.
+
+Run this update to do this:
+
+```sql
+update toys
+set   volume_of_wood = -1
+where volume_of_wood is null;
+
+select * from toys;
+```
+
+You can now use standard comparison logic to find all the rows with a volume of wood less than 15 or where it doesn't apply:
+
+```sql
+select * from toys
+where volume_of_wood < 15;
+```
+
+__At first glance this seems to make your code simpler. But it brings complications elsewhere. For example, say you're analysing the volume of wood used in your toys. You want to find the mean, standard deviation and minimum values for this.__
+
+Only Blue Brick and Red Brick use wood. So these calculations should return 15, 7.07 (rounded), and 10 respectively.
+
+But if you run the query below, you get different results:
+
+```sql
+select avg ( volume_of_wood ),
+       stddev ( volume_of_wood ),
+       min ( volume_of_wood )
+from   toys;
+```
+
+This is because it includes the "impossible" value of -1 for Mr. Penguin.
+
+To avoid this, you need to check that the volume_of_wood is greater than or equal to zero:
+
+```sql
+select avg ( volume_of_wood ),
+       stddev ( volume_of_wood ),
+       min ( volume_of_wood )
+from   toys
+where  volume_of_wood >= 0; 
+```
+
+So while magic values appear to make life easier, they often bring bigger problems elsewhere.
