@@ -1,4 +1,4 @@
-# Subqueries: 
+# Subqueries
 
 ### Content
 
