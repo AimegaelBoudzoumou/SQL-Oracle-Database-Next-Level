@@ -93,7 +93,7 @@ Complete the query below, using an inline view to find the min and max brick_id 
 
 ```
 
-The solution is:
+This is a solution:
 ```sql
 
 ```
