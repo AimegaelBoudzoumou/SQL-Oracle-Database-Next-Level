@@ -41,7 +41,7 @@ insert into bricks values (5, 'green');
 insert into bricks values (6, 'red');
 insert into bricks values (7, 'red');
 insert into bricks values (8, 'red');
-insert into bricks values (8, null);
+insert into bricks values (9, null);
 
 commit;
 ```
@@ -90,13 +90,21 @@ where nvl ( brick_counts.c, 0 ) < colours.minimum_bricks_needed
 Complete the query below, using an inline view to find the min and max brick_id for each colour of brick:
 
 ```sql
+select * from (
 
+)
 ```
+Hint: you need group by colour. Use min(brick_id) to find the minimum. The query should return the following rows (the order may be different):
 
 This is a solution:
 ```sql
-
+select * from (
+    select colour, min(brick_id), max(brick_id)
+    from bricks
+    group by colour
+)
 ```
+![image](https://github.com/user-attachments/assets/102bd72d-622e-49e7-be46-9c0283307bc0)
 
 ## 3. Nested Subqueries
 ## 4. Correlated vs. Uncorrelated
