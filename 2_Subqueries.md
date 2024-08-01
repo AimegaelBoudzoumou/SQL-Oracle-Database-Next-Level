@@ -292,7 +292,9 @@ select c.colour_name, (
 from  colours c
 where c.colour_name is not null;
 ```
-![Uploading image.png…]()
+
+![image](https://github.com/user-attachments/assets/d4eb0f2c-1efd-46dc-bf58-9fe6c5d45741)
+
 
 ## 7. Common Table Expressions
 ## 8. CTEs: Reusabe Subqueries
