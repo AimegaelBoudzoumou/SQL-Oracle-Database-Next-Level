@@ -187,10 +187,101 @@ where  c.colour_name not in (
 );
 ```
 And your query returns nothing!
+This is because there is a row in bricks with a null colour. So the previous query is the same as:
 
+```sql
+select * from colours c
+where c.colour_name not in (
+    'red', 'green', 'blue',
+    'orange', 'yellow', 'purple',
+    null
+);
+```
+For the NOT IN condition to be true, comparing all its elements to the parent table must return false.
 
+But remember that comparing anything to null gives unknown! So the whole expression is unknown and you get no data.
+
+To resolve this, either use NOT EXISTS or add a where clause to stop the subquery returning null values:
+```sql
+select * from colours c
+where c.colour_name not in (
+    select b.colour from bricks b
+    where  b.colour is not null
+);
+```
+### Try it
+Complete the subquery to find all the rows in bricks with a colour where colours.minimum_bricks_needed = 2:
+
+```sql
+```
+
+This is a solution:
+```sql
+select * from bricks b
+where b.colour in (
+    select c.colour_name from colours c
+    where c.minimum_bricks_needed = 2
+);
+
+select * from bricks b
+where exists (
+    select c.colour_name from colours c
+    where c.minimum_bricks_needed = 2
+    and   c.colour_name = b.colour
+);
+```
+![Uploading image.png…]()
 
 ## 6. Scalar Subqueries
+Scalar subqueries return one column and at most one row. You can replace a column with a scalar subquery in most cases.
+
+For example, to return a count of the number of bricks matching each colour, you could do the following:
+```sql
+select colour_name, (
+    select count(*)
+    from bricks b
+    where b.colour = c.colour_name
+    group by b.colour
+)   bricks_counts
+from colours c;
+```
+Note the colours with no matching bricks return null. To show zero instead, you can use NVL or coalesce. This needs to go around the whole subquery:
+```sql
+select colour_name, nvl ( (
+    	select count(*)
+    	from   bricks b
+    	where  b.colour = c.colour_name
+    	group by b.colour
+    ), 0 ) brick_counts
+from colours c;
+```
+Usually you will correlate a scalar subquery with a parent table to give the correct answer.
+
+You can also use scalar subqueries in your having clause. So instead of a join, you could write the query in part 1 to find those bricks you have less than the minimum needed like so:
+
+```sql
+select colour, count(*) c
+from bricks b
+group by colour
+having count(*) < (
+    select c.minimum_bricks_needed
+    from   colours c
+    where  c.colour_name = b.colour
+);
+```
+### Try it
+Complete the scalar subquery below to find the minimum brick_id for each colour:
+
+```sql
+select c.colour_name, (
+
+       ) min_brick_id
+from   colours c
+where  c.colour_name is not null;
+```
+This is a solution:
+
+
 ## 7. Common Table Expressions
 ## 8. CTEs: Reusabe Subqueries
 ## 9. Literate SQL
