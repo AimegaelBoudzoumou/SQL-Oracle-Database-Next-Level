@@ -230,7 +230,7 @@ where exists (
     and   c.colour_name = b.colour
 );
 ```
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/bbf85a4e-8c59-49e4-8fa6-2242662e7751)
 
 ## 6. Scalar Subqueries
 Scalar subqueries return one column and at most one row. You can replace a column with a scalar subquery in most cases.
@@ -279,8 +279,20 @@ select c.colour_name, (
 from   colours c
 where  c.colour_name is not null;
 ```
+
 This is a solution:
 
+```sql
+select c.colour_name, (
+    select min(brick_id)
+    from bricks b
+    where c.colour_name = b.colour
+    group by colour
+      ) min_brick_id
+from  colours c
+where c.colour_name is not null;
+```
+![Uploading image.png…]()
 
 ## 7. Common Table Expressions
 ## 8. CTEs: Reusabe Subqueries
