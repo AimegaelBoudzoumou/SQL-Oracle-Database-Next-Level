@@ -168,6 +168,28 @@ Return all the in colours if there is at least one row in bricks
 To find all the colour rows which have at least one row in bricks of the same colour, you must join in the subquery. Normally you need to correlate EXISTS subqueries with a table in the parent.
 
 ## 5. NOT IN vs NOT EXISTS
+You can do the reverse of IN & EXISTS by placing NOT in front of them. This returns you all the rows from the parent which don't have a match in the subquery.
+
+For example to find all the rows in colours without a matching colour in bricks, you can use NOT EXISTS:
+
+```sql
+select * from colours c
+where not exists (
+    select null from bricks b
+    where c.colour_name = b.colour
+);
+```
+But do the same with NOT IN:
+```sql
+select * from colours c
+where  c.colour_name not in (
+    select b.colour from bricks b
+);
+```
+And your query returns nothing!
+
+
+
 ## 6. Scalar Subqueries
 ## 7. Common Table Expressions
 ## 8. CTEs: Reusabe Subqueries
