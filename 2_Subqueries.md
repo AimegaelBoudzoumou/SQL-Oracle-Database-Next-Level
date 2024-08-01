@@ -297,6 +297,20 @@ where c.colour_name is not null;
 
 
 ## 7. Common Table Expressions
+Common table expressions (CTEs) enable you to name subqueries. You then refer to these like normal tables elsewhere in your query. This can make your SQL easier to write and understand later.
+
+CTEs go in the with clause above the select statement. The following defines a CTE that counts how many rows of each colour there are in the bricks table:
+
+```sql
+with brick_colour_counts as (
+    select colour, count(*)
+    from   bricks b
+    group  by colour
+)
+
+select * from brick_colour_counts ;
+```
+
 ## 8. CTEs: Reusabe Subqueries
 ## 9. Literate SQL
 ## 10. Testing Subqueries
