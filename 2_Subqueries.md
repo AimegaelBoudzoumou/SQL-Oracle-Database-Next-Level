@@ -312,5 +312,7 @@ select * from brick_colour_counts ;
 ```
 
 ## 8. CTEs: Reusabe Subqueries
+
+
 ## 9. Literate SQL
 ## 10. Testing Subqueries
