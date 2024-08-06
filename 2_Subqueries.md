@@ -368,4 +368,9 @@ So now if you need to join bricks to a new table to get the count you only have 
 Oracle Database can also optimize queries that access the same CTE many times. This can make it more efficient than regular subqueries.
 
 ## 9. Literate SQL
+Literate programming is a concept introduced by Donald Knuth. The idea is to write code that makes sense if you read it like a book: from start to finish.
+
+Simple SQL queries follow this principle. For example the query "Get me the brick_ids of all the bricks that are red or blue" is the following statement:
+
+
 ## 10. Testing Subqueries
