@@ -312,7 +312,58 @@ select * from brick_colour_counts ;
 ```
 
 ## 8. CTEs: Reusabe Subqueries
+Because you access CTEs in the same way as a regular table, you can use it many times in your query. This can help if you want to use this subquery many times.
 
+For example if you want to find:
+- Which colours you have more bricks of than the minimum needed
+- The average number of bricks you have of each colour
+
+You need to group the bricks by colour. Then filter the colours table where this count is greater than the minimum_bricks_needed for that colour. And compute the mean of the counts.
+
+You can do the filtering with a nested subquery. And show the average in a scalar subquery. This looks like:
+
+```sql
+select c.colour_name,
+       c.minimum_bricks_needed, (
+         select avg ( count(*) )
+         from   bricks b
+         group  by b.colour
+       ) mean_bricks_per_colour
+from    colours c
+where   c.minimum_bricks_needed < (
+    select count(*) c
+    from   bricks b
+    where  b.colour = c.colour_name
+    group  by b.colour
+);
+```
+
+Note that "group by colour" appears twice in the statement. This creates maintenance problems. If you need to change this, say to join bricks to another table, you have to do this in two places.
+
+Using CTEs, you can do the group by once. Then refer to it in your select:
+
+```sql
+with brick_counts as (
+    select b.colour, count(*) c
+    from   bricks b
+    group  by b.colour
+)
+    select c.colour_name,
+           c.minimum_bricks_needed, (
+             select avg ( bc.c )
+             from   brick_counts bc
+           ) mean_bricks_per_colour
+    from   colours c
+    where  c.minimum_bricks_needed < (
+      select bc.c
+      from   brick_counts bc
+      where  bc.colour = c.colour_name
+    );
+```
+
+So now if you need to join bricks to a new table to get the count you only have to edit the subquery brick_counts.
+
+Oracle Database can also optimize queries that access the same CTE many times. This can make it more efficient than regular subqueries.
 
 ## 9. Literate SQL
 ## 10. Testing Subqueries
