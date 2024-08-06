@@ -337,6 +337,7 @@ where   c.minimum_bricks_needed < (
     group  by b.colour
 );
 ```
+![image](https://github.com/user-attachments/assets/1f036b72-f547-4267-ad7f-d05c74e63cf2)
 
 Note that "group by colour" appears twice in the statement. This creates maintenance problems. If you need to change this, say to join bricks to another table, you have to do this in two places.
 
@@ -360,6 +361,7 @@ with brick_counts as (
       where  bc.colour = c.colour_name
     );
 ```
+![image](https://github.com/user-attachments/assets/95a0cff6-d8a4-45f1-a5dc-c2158e729ff0)
 
 So now if you need to join bricks to a new table to get the count you only have to edit the subquery brick_counts.
 
