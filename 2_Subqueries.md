@@ -372,5 +372,53 @@ Literate programming is a concept introduced by Donald Knuth. The idea is to wri
 
 Simple SQL queries follow this principle. For example the query "Get me the brick_ids of all the bricks that are red or blue" is the following statement:
 
+```sqm
+select brick_id
+from   bricks
+where  colour in ('red', 'blue');
+```
+
+But subqueries usually break this human readable flow. For example, if you want to find which bricks you have less of than the average number of each colour, you need to:
+
+1. Count the bricks by colour
+2. Take the average of these counts
+3. Return those rows where the value in step 1 is less than in step 2
+
+Without the with clause, you need to write something like the following:
+
+```sql
+select colour
+from   bricks
+group  by colour
+having count (*) < (
+    select avg ( colour_count )
+    from   (
+      select colour, count (*) colour_count
+      from   bricks
+      group  by colour
+    )
+);
+```
+
+Step one is at the bottom of the query! Using CTEs, you can order the subqueries to match the logic above:
+
+```sql
+with brick_counts as (
+    -- 1. Count the bricks by colour
+    select b.colour, count (*) c
+    from   bricks b
+    group  by b.colour
+),   average_bricks_per_colour as (
+    -- 2. Take the average of these counts
+    select avg ( c ) average_count
+    from   brick_counts
+)
+    select * from brick_counts bc
+    join   average_bricks_per_colour ac
+	-- 3. Return those rows where the value in step 1 is less than in step 2
+	on     bc.c < ac.average_count;
+```
+
+This makes it easier to figure out what a SQL statement does when you return to it later.
 
 ## 10. Testing Subqueries
