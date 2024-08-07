@@ -418,6 +418,7 @@ with brick_counts as (
 	-- 3. Return those rows where the value in step 1 is less than in step 2
 	on     bc.c < ac.average_count;
 ```
+![image](https://github.com/user-attachments/assets/481f154b-14cd-4397-a3fb-3ce21fa47e7d)
 
 This makes it easier to figure out what a SQL statement does when you return to it later.
 
