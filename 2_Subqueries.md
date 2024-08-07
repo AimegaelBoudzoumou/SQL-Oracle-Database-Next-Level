@@ -423,3 +423,37 @@ with brick_counts as (
 This makes it easier to figure out what a SQL statement does when you return to it later.
 
 ## 10. Testing Subqueries
+Another big advantage of the with clause is it makes your SQL easier to test and debug.
+
+If you want to check that the brick counts from the previous query are correct, update the final from clause:
+```sql
+with brick_counts as (
+    select b.colour, count (*) c
+    from   bricks b
+    group  by b.colour
+),   average_bricks_per_colour as (
+    select avg ( c ) average_count
+    from   brick_counts
+)
+    select * from brick_counts bc;
+```
+
+### Try it
+Complete the following with clause to count how many rows there are in colours:
+```sql
+with colour_count as (
+
+)
+  select * from colour_count;
+```
+
+This is a solution:
+```sql
+with colour_count as (
+    select count (*)
+    from   colours
+)
+ select * from colour_count;
+```
+![image](https://github.com/user-attachments/assets/157de535-5357-41fe-be66-5341f19400d2)
+
