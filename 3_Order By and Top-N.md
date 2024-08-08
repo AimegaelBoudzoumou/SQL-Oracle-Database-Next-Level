@@ -131,8 +131,89 @@ order  by price, last_lost_date desc nulls first;
 ![image](https://github.com/user-attachments/assets/c5a99362-586d-44e9-8886-803389323fed)
 
 ## 6. Custom Sorting
+Sometimes you want to order data in way that doesn't follow the standard sorting rules. For example, say you want to sort the toys by name. But Miss Snuggles is your favourite, so you want this to always appear at the top. All the toys after should appear alphabetically.
 
+To do this, you need to map Miss Snuggles to a value lower than for all the other toys. For example, 1 for Miss Snuggles and 2 for everything else.
+
+You can do this with a case expression in your order by. For example:
+
+```sql
+select * from toys
+order  by case
+  when toy_name = 'Miss Snuggles' then 1
+  else 2
+end, toy_name;
+```
 
 ## 7. Positional Notation vs. Aliases
+It can be tricky to debug custom sorting functions. To help with this, include the expression in your select:
+
+```sql
+select t.*,
+       case
+         when toy_name = 'Miss Snuggles' then 1
+         else 2
+       end
+from   toys t
+order  by case
+         when toy_name = 'Miss Sbuggles' then 1
+         else 2
+       end, toy_name;
+
+```
+
+But this means you have the function in two places! This makes code maintenance harder.
+
+You can avoid this by using positional notation or aliases.
+
+### Positional notation
+This is where you put the number of the column in the select you want to order by (working from left to right in the output). So the following sorts by the sixth column then the first. i.e. the case expression then toy_name:
+```sql
+select t.*,
+       case
+         when toy_name = 'Miss Snuggles' then 1
+         else 2
+       end
+from   toys t
+order  by 6, 1;
+```
+But this makes it hard to spot which column you're sorting by. Particularly if the query uses "select *". And if you need to change the columns you're selecting, it's easy to overlook the positional order by. Leading to wrong results!
+
+### Aliases
+It's better to give the function an alias. Then refer to this alias in the order by clause:
+
+```sql
+select t.*,
+       case
+         when toy_name = 'Miss Snuggles' then 1
+         else 2
+       end custom_sort
+from   toys t
+order  by custom_sort, toy_name;
+```
+
+### Try it
+Complete the query, so:
+
+- Kangaroo is top
+- Blue Dinosaur is second
+- The remaining toys are ordered by price, cheapest to most expensive
+
+```sql
+select t.toy_name, t.price,
+       case
+         when toy_name = 'Kangaroo'
+         when toy_name = 'Blue Dinosaur'
+         else 
+       end custom_sort
+from   toys t
+order  by
+```
+
+This is a solution:
+```sql
+
+```
+
 ## 8. Top-N Queries
 ## 9. Top-N with Ties
