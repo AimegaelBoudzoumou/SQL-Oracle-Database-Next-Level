@@ -100,9 +100,39 @@ order  by weight, purchased_date desc;
 ![image](https://github.com/user-attachments/assets/51c3ce6b-8bae-4ef8-ab8c-95d008c1eda7)
 
 ## 5. Sorting Null
+By default, Oracle Database sorts null last in the data:
+```sql
+select * from toys
+order  by last_lost_date;
+```
 
+You can change this with the nulls clause. Set this to nulls first to get null-valued rows at the top:
+```sql
+select * from toys
+order  by last_lost_date nulls first;
+```
+
+### Try it
+
+Complete the query to sort the rows by:
+
+1. Price, cheapest to most expensive
+2. Toys with same price by date last lost, from newest to oldest. Rows with a null last_lost_date should appear above any of the same price
+```sql
+select toy_name, price, last_lost_date 
+from   toys
+```
+
+This is a solution:
+```sql
+select toy_name, price, last_lost_date from toys
+order  by price, last_lost_date desc nulls first;
+```
+![image](https://github.com/user-attachments/assets/c5a99362-586d-44e9-8886-803389323fed)
 
 ## 6. Custom Sorting
+
+
 ## 7. Positional Notation vs. Aliases
 ## 8. Top-N Queries
 ## 9. Top-N with Ties
