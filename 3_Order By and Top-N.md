@@ -25,7 +25,7 @@ create table toys (
 
 insert into toys values ('Miss Snuggles', 4,  9.99,  date'2018-02-01', date'2018-06-01');
 insert into toys values ('Baby Turtle',   1,  5.00,  date'2016-09-01', date'2017-03-03');
-insert into toys values ('Kangaro',       10, 29.99, date'2017-03-01', date'2018-06-01');
+insert into toys values ('Kangaroo',       10, 29.99, date'2017-03-01', date'2018-06-01');
 insert into toys values ('Blue Dinosaur', 8,  9.99,  date'2013-07-01', date'2016-11-01');
 insert into toys values ('Purple Ninja',  8,  29.99, date'2018-02-01', null);
 
@@ -212,8 +212,132 @@ order  by
 
 This is a solution:
 ```sql
-
+select t.toy_name, t.price,
+       case
+         when toy_name = 'Kangaroo' then 1
+         when toy_name = 'Blue Dinosaur' then 2
+         else 3
+        end custom_sort
+from    toys t
+order   by custom_sort, toy_name;
 ```
 
 ## 8. Top-N Queries
+A top-N query returns the first N rows in a sorted data set. For example, to find the three cheapest toys.
+
+There are several way to do this in Oracle Database
+
+### Rownum
+Rownum is an Oracle-specific function. It assigns an increasing number to each row you fetch.
+
+But if you use it in a where clause before the order by, you'll get unexpected results. For example, the following tries to get the three most expensive toys:
+
+```sql
+select * from toys
+where  rownum <= 3
+order  by price desc;
+```
+
+But it includes the cheapest, Baby Turtle! This is because the database processes order by after where. So this gets any three rows. Then sorts them.
+
+To fix this, sort the data in a subquery. Then filter the results of this:
+```sql
+select * from (
+    select *
+    from   toys t
+    order  by price desc
+)
+where rownum <= 3;
+```
+
+### Row_number
+Row_number is an analytic function. Like rownum, it assigns an incrementing counter. This is determined by the sort defined in the order by in the over clause.
+
+To use this in a top-N query, you must also use a subquery:
+
+```sql
+select * from (
+    select t.*, row_number() over (order by price desc ) rn
+    from toys t
+)
+where rn <= 3
+order by rn;
+```
+
+### Fetch first
+
+Oracle Database 12c introduced the ANSI compliant fetch first clause. This goes after the order by and removes the need to use a subquery:
+
+```sql
+select * from toys
+order  by price desc
+fetch  first 3 rows only;
+```
+
 ## 9. Top-N with Ties
+When doing a top-N query sorting by non-unique values, you have an important question to answer:
+
+Do you want exactly N rows, all the rows for the first N values, or N rows along with any that have the same value as the Nth?
+
+For example, both Miss Snuggles and Blue Dinosaur have a price of 9.99. So if you fetch the three most expensive toys, you could get either of them!
+
+You can guarantee you get both using fetch first. Swap only for "with ties". This will return you N rows, plus any that have the same value for the order by columns as the last. So you get both the 9.99 priced toys:
+```sql
+select toy_name, price from toys
+order  by price desc
+fetch  first 3 row with ties;
+```
+
+You can get the same effect using a subquery by swapping row_number for rank:
+```sql
+select * from (
+    select t.*,
+           rank() over ( order by price desc ) rn
+    from   toys t
+)
+where rn <= 3
+order by rn;
+```
+
+If you want all the rows for the first three values, use dense_rank in the subquery instead:
+
+```sql
+select * from (
+    select t.*,
+           dense_rank() over ( order by price desc ) rn
+    from   toys t
+)
+where rn <= 3
+order by rn;
+```
+
+In all these examples you'll get at least three rows in your output. But it could be many more!
+
+Usually you want to get exactly N rows. To do this and get the same rows every time, ensure there are no duplicated values in your order by columns.
+
+If you want to learn more about the difference between rank, dense_rank and row_number, [watch this video](https://www.youtube.com/watch?v=Tuxxbuywb1w).
+
+### Try it
+Write a query to return the first three toys, ordered by toy_name
+```sql
+select toy_name 
+from   toys
+```
+
+This is a solution:
+```sql
+select toy_name 
+from toys
+order by toy_name
+fetch first 3 row with ties;
+
+select toy_name from (
+    select t.*,
+           rank() over ( order by toy_name ) rn
+    from toys t
+)
+where rn <= 3
+order by rn;
+```
+![image](https://github.com/user-attachments/assets/92883c39-f16a-45b3-bd19-e9db3cd42624)
+
